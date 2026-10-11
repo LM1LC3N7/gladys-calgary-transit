@@ -151,7 +151,14 @@ async function get(config, url, feed, accept) {
  * @returns {Promise<Uint8Array>}
  */
 export async function readFeed(config, url, feed) {
-  const response = await get(config, url, feed, 'application/x-protobuf');
+  // ETS answers 406 to a strict application/x-protobuf: its feeds are served
+  // as application/protocol-buffer.
+  const response = await get(
+    config,
+    url,
+    feed,
+    'application/x-protobuf, application/octet-stream;q=0.9, */*;q=0.8',
+  );
   return new Uint8Array(await response.arrayBuffer());
 }
 
@@ -363,6 +370,15 @@ export function departuresFromFeed(feed, stop, nowSeconds) {
       logger.warn('The real-time feed names no route for some trips: they show without a route.');
     }
     if (stop.routes.length > 0 && !stop.routes.includes(normalizeRoute(route))) continue;
+    // A trip on a detour may come twice (ETS): as itself, and as the trip
+    // modified, without a route. One departure, the one naming its route.
+    const twin = departures.find(
+      (departure) => stopTime.tripId && departure.tripId === stopTime.tripId,
+    );
+    if (twin) {
+      if (!twin.route && route) twin.route = route;
+      continue;
+    }
     departures.push({
       route,
       // A feed naming the direction (NextBus) is the freshest word on it.

@@ -253,7 +253,10 @@ async function main() {
         NETWORK.gtfs.scheduleOnlyRoutes,
       )
     : new Set();
-  const stops = buildStops(read('stops.txt'), stopName, scheduleOnly);
+  // A regional feed (ETS) also lists the stops of its neighbours: only the
+  // operator's own are kept.
+  const keepStop = NETWORK.gtfs.keepStop ?? (() => true);
+  const stops = buildStops(read('stops.txt').filter(keepStop), stopName, scheduleOnly);
   const routes = buildRoutes(read('routes.txt'));
 
   mkdirSync('gtfs', { recursive: true });

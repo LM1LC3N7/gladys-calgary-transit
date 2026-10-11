@@ -122,6 +122,8 @@ test('one read of the open feed serves every stop', async () => {
   assert.equal(calls.length, 1);
   assert.equal(calls[0].url, NETWORK.realtime.tripUpdatesUrl);
   assert.match(calls[0].headers['User-Agent'], /^gladys-calgary-transit\//);
+  // Some servers refuse a strict protobuf Accept header (ETS: HTTP 406).
+  assert.match(calls[0].headers.Accept, /\*\/\*/);
 
   // A new interval reads again; so does a forced fresh read.
   await fetchDepartures(config, config.watched.stops[0], { now: NOW_MS + 60_000 });
@@ -221,4 +223,33 @@ test('a network error is reported, and a key would be redacted', async () => {
   );
   assert.equal(redact('a k3y b k3y', 'k3y'), 'a *** b ***');
   assert.equal(redact('text', ''), 'text');
+});
+
+test('a trip on a detour, listed twice, is one departure with its route', async () => {
+  stubFetch({
+    [FEED]: encodeFeed({
+      timestamp: NOW,
+      entities: [
+        {
+          // The detour first (trip modifications): named by the trip it
+          // modifies, without a route.
+          tripUpdate: {
+            trip: { affectedTripId: 'T9' },
+            stopTimeUpdates: [{ stopId: '5299', arrival: { time: NOW + 300 } }],
+          },
+        },
+        {
+          tripUpdate: {
+            trip: { tripId: 'T9', routeId: '22' },
+            stopTimeUpdates: [{ stopId: '5299', arrival: { time: NOW + 300 } }],
+          },
+        },
+      ],
+    }),
+  });
+  const board = await fetchDepartures(config, config.watched.stops[0], { now: NOW_MS });
+  assert.deepEqual(
+    board.map((departure) => [departure.tripId, departure.route]),
+    [['T9', '22']],
+  );
 });

@@ -30,12 +30,13 @@ always says what to do next. Keep it that way: every new setting needs a
 default that works, and every failure a message that says what to do.
 
 **Sister integrations.** `gladys-translink` (Vancouver), `gladys-octranspo`
-(Ottawa), `gladys-rtc-quebec` (Québec), `gladys-ttc` (Toronto) and
-`gladys-calgary-transit` (Calgary) share this code base, derived from
-`gladys-stm` (Montréal). Everything that names the network lives in
-`src/network.js`, its data in `gtfs/`, its texts in the manifest and the
-docs: the rest of the code is identical in the five repositories, and a fix
-to it belongs in the five (and in gladys-stm when it applies there).
+(Ottawa), `gladys-rtc-quebec` (Québec), `gladys-ttc` (Toronto),
+`gladys-calgary-transit` (Calgary) and `gladys-edmonton-transit` (Edmonton)
+share this code base, derived from `gladys-stm` (Montréal). Everything that
+names the network lives in `src/network.js`, its data in `gtfs/`, its texts
+in the manifest and the docs: the rest of the code is identical in the six
+repositories, and a fix to it belongs in the six (and in gladys-stm when it
+applies there).
 
 ## Commands
 

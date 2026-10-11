@@ -10,6 +10,13 @@ the notes of the version's GitHub Release.
 
 ## [Unreleased]
 
+### Fixed
+
+- A trip on a detour, which the real-time feed lists twice, shows once on
+  the board, with its route.
+- The real-time requests accept any content type: some servers refuse a
+  strict protobuf one.
+
 ## [0.1.0] - 2026-10-11
 
 ### Added
