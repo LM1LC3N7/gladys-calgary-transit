@@ -1,6 +1,6 @@
 {
   "name": "gladys-calgary-transit",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "private": true,
   "description": "Gladys Assistant external integration for Calgary Transit: next bus and CTrain departures in real time and the CTrain line status.",
   "type": "module",
